@@ -1,717 +1,717 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberCafe Pro - Management System</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --primary: #6366f1; --primary-dark: #4f46e5; --secondary: #06b6d4;
-            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
-            --dark: #1e293b; --darker: #0f172a; --light: #f8fafc; --gray: #64748b;
-            --sidebar-width: 260px;
-        }
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--darker); color: var(--light); overflow-x: hidden;
-        }
-        .sidebar {
-            position: fixed; left: 0; top: 0; width: var(--sidebar-width);
-            height: 100vh; background: var(--dark);
-            border-right: 1px solid rgba(255,255,255,0.05); z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-        .sidebar-header {
-            padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex; align-items: center; gap: 12px;
-        }
-        .sidebar-header svg { width: 28px; height: 28px; fill: var(--primary); }
-        .sidebar-header h1 {
-            font-size: 20px; font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .nav-menu { padding: 20px 15px; }
-        .nav-item {
-            display: flex; align-items: center; gap: 12px; padding: 14px 18px;
-            margin-bottom: 8px; border-radius: 12px; cursor: pointer;
-            transition: all 0.3s ease; color: var(--gray); font-weight: 500;
-        }
-        .nav-item:hover, .nav-item.active {
-            background: rgba(99, 102, 241, 0.1); color: var(--primary);
-        }
-        .nav-item.active { background: var(--primary); color: white; }
-        .nav-item svg { width: 18px; height: 18px; fill: currentColor; }
-        .main-content {
-            margin-left: var(--sidebar-width); min-height: 100vh; padding: 30px;
-        }
-        .header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 30px;
-        }
-        .header h2 { font-size: 28px; font-weight: 700; }
-        .header-actions { display: flex; gap: 12px; align-items: center; }
-        .btn {
-            padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer;
-            font-weight: 600; font-size: 14px; transition: all 0.3s ease;
-            display: inline-flex; align-items: center; gap: 8px;
-        }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover {
-            background: var(--primary-dark); transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
-        }
-        .btn-success { background: var(--success); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-warning { background: var(--warning); color: white; }
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px; margin-bottom: 30px;
-        }
-        .stat-card {
-            background: var(--dark); border-radius: 16px; padding: 25px;
-            border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s ease;
-        }
-        .stat-card:hover { transform: translateY(-5px); }
-        .stat-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 15px;
-        }
-        .stat-icon {
-            width: 48px; height: 48px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .stat-icon svg { width: 20px; height: 20px; }
-        .stat-icon.purple { background: rgba(99, 102, 241, 0.1); fill: var(--primary); }
-        .stat-icon.cyan { background: rgba(6, 182, 212, 0.1); fill: var(--secondary); }
-        .stat-icon.green { background: rgba(16, 185, 129, 0.1); fill: var(--success); }
-        .stat-icon.orange { background: rgba(245, 158, 11, 0.1); fill: var(--warning); }
-        .stat-value { font-size: 32px; font-weight: 700; margin-bottom: 5px; }
-        .stat-label { color: var(--gray); font-size: 14px; }
-        .stat-change { font-size: 12px; margin-top: 8px; font-weight: 600; }
-        .stat-change.positive { color: var(--success); }
-        .section-title {
-            font-size: 20px; font-weight: 600; margin-bottom: 20px;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .computers-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px; margin-bottom: 30px;
-        }
-        .computer-card {
-            background: var(--dark); border-radius: 16px; padding: 20px;
-            border: 2px solid transparent; transition: all 0.3s ease;
-            cursor: pointer; position: relative; overflow: hidden;
-        }
-        .computer-card:hover {
-            border-color: var(--primary); transform: translateY(-3px);
-        }
-        .computer-card.active { border-color: var(--success); }
-        .computer-card.maintenance { border-color: var(--warning); opacity: 0.7; }
-        .computer-status {
-            position: absolute; top: 15px; right: 15px;
-            width: 12px; height: 12px; border-radius: 50%;
-        }
-        .computer-status.available { background: var(--success); box-shadow: 0 0 10px var(--success); }
-        .computer-status.occupied { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
-        .computer-status.maintenance { background: var(--warning); }
-        .computer-icon { text-align: center; margin-bottom: 15px; }
-        .computer-icon svg { width: 48px; height: 48px; fill: var(--gray); }
-        .computer-card.active .computer-icon svg { fill: var(--success); }
-        .computer-card.maintenance .computer-icon svg { fill: var(--warning); }
-        .computer-name { text-align: center; font-weight: 600; margin-bottom: 8px; }
-        .computer-info { text-align: center; font-size: 12px; color: var(--gray); }
-        .computer-timer {
-            text-align: center; font-size: 18px; font-weight: 700;
-            color: var(--secondary); margin-top: 10px; font-family: 'Courier New', monospace;
-        }
-        .table-container {
-            background: var(--dark); border-radius: 16px; padding: 25px;
-            border: 1px solid rgba(255,255,255,0.05); overflow-x: auto;
-        }
-        table { width: 100%; border-collapse: collapse; }
-        th {
-            text-align: left; padding: 15px; color: var(--gray); font-weight: 600;
-            font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        tr:hover { background: rgba(255,255,255,0.02); }
-        .badge {
-            padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
-        }
-        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center;
-            align-items: center; backdrop-filter: blur(5px);
-        }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background: var(--dark); border-radius: 20px; padding: 30px;
-            width: 90%; max-width: 500px;
-            border: 1px solid rgba(255,255,255,0.1);
-            animation: modalSlide 0.3s ease;
-        }
-        @keyframes modalSlide {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 25px;
-        }
-        .modal-header h3 { font-size: 22px; }
-        .close-btn {
-            background: none; border: none; color: var(--gray);
-            font-size: 24px; cursor: pointer; transition: color 0.3s;
-        }
-        .close-btn:hover { color: var(--danger); }
-        .form-group { margin-bottom: 20px; }
-        .form-group label {
-            display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;
-        }
-        .form-control {
-            width: 100%; padding: 12px 16px; background: var(--darker);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
-            color: var(--light); font-size: 14px; transition: border-color 0.3s;
-        }
-        .form-control:focus { outline: none; border-color: var(--primary); }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .search-bar { display: flex; gap: 15px; margin-bottom: 25px; }
-        .search-input {
-            flex: 1; padding: 12px 20px; background: var(--dark);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-            color: var(--light); font-size: 14px;
-        }
-        .search-input:focus { outline: none; border-color: var(--primary); }
-        .timer-display {
-            font-family: 'Courier New', monospace; font-size: 14px;
-            color: var(--secondary); font-weight: 600;
-        }
-        .price-tag {
-            font-weight: 700; color: var(--success);
-        }
-        .naira { font-family: 'Segoe UI', sans-serif; }
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; }
-            .computers-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-        }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--darker); }
-        ::-webkit-scrollbar-thumb { background: var(--gray); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberCafe Pro - Management System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1; --primary-dark: #4f46e5; --secondary: #06b6d4;
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+            --dark: #1e293b; --darker: #0f172a; --light: #f8fafc; --gray: #64748b;
+            --sidebar-width: 260px;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--darker); color: var(--light); overflow-x: hidden;
+        }
+        .sidebar {
+            position: fixed; left: 0; top: 0; width: var(--sidebar-width);
+            height: 100vh; background: var(--dark);
+            border-right: 1px solid rgba(255,255,255,0.05); z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-header {
+            padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sidebar-header svg { width: 28px; height: 28px; fill: var(--primary); }
+        .sidebar-header h1 {
+            font-size: 20px; font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .nav-menu { padding: 20px 15px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+            margin-bottom: 8px; border-radius: 12px; cursor: pointer;
+            transition: all 0.3s ease; color: var(--gray); font-weight: 500;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(99, 102, 241, 0.1); color: var(--primary);
+        }
+        .nav-item.active { background: var(--primary); color: white; }
+        .nav-item svg { width: 18px; height: 18px; fill: currentColor; }
+        .main-content {
+            margin-left: var(--sidebar-width); min-height: 100vh; padding: 30px;
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h2 { font-size: 28px; font-weight: 700; }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .btn {
+            padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer;
+            font-weight: 600; font-size: 14px; transition: all 0.3s ease;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover {
+            background: var(--primary-dark); transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px; margin-bottom: 30px;
+        }
+        .stat-card {
+            background: var(--dark); border-radius: 16px; padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px;
+        }
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .stat-icon svg { width: 20px; height: 20px; }
+        .stat-icon.purple { background: rgba(99, 102, 241, 0.1); fill: var(--primary); }
+        .stat-icon.cyan { background: rgba(6, 182, 212, 0.1); fill: var(--secondary); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.1); fill: var(--success); }
+        .stat-icon.orange { background: rgba(245, 158, 11, 0.1); fill: var(--warning); }
+        .stat-value { font-size: 32px; font-weight: 700; margin-bottom: 5px; }
+        .stat-label { color: var(--gray); font-size: 14px; }
+        .stat-change { font-size: 12px; margin-top: 8px; font-weight: 600; }
+        .stat-change.positive { color: var(--success); }
+        .section-title {
+            font-size: 20px; font-weight: 600; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .computers-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px; margin-bottom: 30px;
+        }
+        .computer-card {
+            background: var(--dark); border-radius: 16px; padding: 20px;
+            border: 2px solid transparent; transition: all 0.3s ease;
+            cursor: pointer; position: relative; overflow: hidden;
+        }
+        .computer-card:hover {
+            border-color: var(--primary); transform: translateY(-3px);
+        }
+        .computer-card.active { border-color: var(--success); }
+        .computer-card.maintenance { border-color: var(--warning); opacity: 0.7; }
+        .computer-status {
+            position: absolute; top: 15px; right: 15px;
+            width: 12px; height: 12px; border-radius: 50%;
+        }
+        .computer-status.available { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .computer-status.occupied { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+        .computer-status.maintenance { background: var(--warning); }
+        .computer-icon { text-align: center; margin-bottom: 15px; }
+        .computer-icon svg { width: 48px; height: 48px; fill: var(--gray); }
+        .computer-card.active .computer-icon svg { fill: var(--success); }
+        .computer-card.maintenance .computer-icon svg { fill: var(--warning); }
+        .computer-name { text-align: center; font-weight: 600; margin-bottom: 8px; }
+        .computer-info { text-align: center; font-size: 12px; color: var(--gray); }
+        .computer-timer {
+            text-align: center; font-size: 18px; font-weight: 700;
+            color: var(--secondary); margin-top: 10px; font-family: 'Courier New', monospace;
+        }
+        .table-container {
+            background: var(--dark); border-radius: 16px; padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05); overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: left; padding: 15px; color: var(--gray); font-weight: 600;
+            font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        tr:hover { background: rgba(255,255,255,0.02); }
+        .badge {
+            padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        }
+        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center;
+            align-items: center; backdrop-filter: blur(5px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--dark); border-radius: 20px; padding: 30px;
+            width: 90%; max-width: 500px;
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: modalSlide 0.3s ease;
+        }
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px;
+        }
+        .modal-header h3 { font-size: 22px; }
+        .close-btn {
+            background: none; border: none; color: var(--gray);
+            font-size: 24px; cursor: pointer; transition: color 0.3s;
+        }
+        .close-btn:hover { color: var(--danger); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;
+        }
+        .form-control {
+            width: 100%; padding: 12px 16px; background: var(--darker);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+            color: var(--light); font-size: 14px; transition: border-color 0.3s;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .search-bar { display: flex; gap: 15px; margin-bottom: 25px; }
+        .search-input {
+            flex: 1; padding: 12px 20px; background: var(--dark);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            color: var(--light); font-size: 14px;
+        }
+        .search-input:focus { outline: none; border-color: var(--primary); }
+        .timer-display {
+            font-family: 'Courier New', monospace; font-size: 14px;
+            color: var(--secondary); font-weight: 600;
+        }
+        .price-tag {
+            font-weight: 700; color: var(--success);
+        }
+        .naira { font-family: 'Segoe UI', sans-serif; }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .computers-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--darker); }
+        ::-webkit-scrollbar-thumb { background: var(--gray); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+    </style>
 </head>
 <body>
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
-            <h1>CyberCafe Pro</h1>
-        </div>
-        <nav class="nav-menu">
-            <div class="nav-item active" onclick="showSection('dashboard', event)">
-                <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-                <span>Dashboard</span>
-            </div>
-            <div class="nav-item" onclick="showSection('computers', event)">
-                <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
-                <span>Computers</span>
-            </div>
-            <div class="nav-item" onclick="showSection('sessions', event)">
-                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                <span>Active Sessions</span>
-            </div>
-            <div class="nav-item" onclick="showSection('customers', event)">
-                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                <span>Customers</span>
-            </div>
-            <div class="nav-item" onclick="showSection('billing', event)">
-                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
-                <span>Billing</span>
-            </div>
-            <div class="nav-item" onclick="showSection('reports', event)">
-                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-                <span>Reports</span>
-            </div>
-            <div class="nav-item" onclick="showSection('settings', event)">
-                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L3.16 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                <span>Settings</span>
-            </div>
-        </nav>
-    </aside>
-    <main class="main-content">
-        <div id="dashboard" class="section">
-            <div class="header">
-                <h2>Dashboard Overview</h2>
-                <div class="header-actions">
-                    <button class="btn btn-primary" onclick="openModal('newSessionModal')">
-                        <span>+</span> New Session
-                    </button>
-                </div>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-value" id="activeComputers">8</div>
-                            <div class="stat-label">Active Computers</div>
-                        </div>
-                        <div class="stat-icon purple">
-                            <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
-                        </div>
-                    </div>
-                    <div class="stat-change positive">+ 12% from yesterday</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-value naira" id="totalRevenue">₦185,000</div>
-                            <div class="stat-label">Today's Revenue</div>
-                        </div>
-                        <div class="stat-icon green">
-                            <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
-                        </div>
-                    </div>
-                    <div class="stat-change positive">+ 8% from yesterday</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-value" id="activeSessions">7</div>
-                            <div class="stat-label">Active Sessions</div>
-                        </div>
-                        <div class="stat-icon cyan">
-                            <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                        </div>
-                    </div>
-                    <div class="stat-change positive">+ 5 new today</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-value" id="availableComputers">8</div>
-                            <div class="stat-label">Available</div>
-                        </div>
-                        <div class="stat-icon orange">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        </div>
-                    </div>
-                    <div class="stat-change">Same as yesterday</div>
-                </div>
-            </div>
-            <h3 class="section-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary)"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
-                Computer Status
-            </h3>
-            <div class="computers-grid" id="computerGrid"></div>
-            <h3 class="section-title" style="margin-top:30px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary)"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                Recent Sessions
-            </h3>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>Customer</th><th>Computer</th><th>Start Time</th><th>Duration</th><th>Amount</th><th>Status</th></tr></thead>
-                    <tbody id="recentSessions"></tbody>
-                </table>
-            </div>
-        </div>
-        <div id="computers" class="section" style="display:none;">
-            <div class="header">
-                <h2>Computer Management</h2>
-                <div class="header-actions">
-                    <button class="btn btn-primary" onclick="openModal('addComputerModal')"><span>+</span> Add Computer</button>
-                </div>
-            </div>
-            <div class="search-bar">
-                <input type="text" class="search-input" placeholder="Search computers..." id="computerSearch">
-                <button class="btn btn-primary" onclick="filterComputers()">Search</button>
-            </div>
-            <div class="computers-grid" id="allComputersGrid"></div>
-        </div>
-        <div id="sessions" class="section" style="display:none;">
-            <div class="header">
-                <h2>Active Sessions</h2>
-                <div class="header-actions">
-                    <button class="btn btn-primary" onclick="openModal('newSessionModal')"><span>+</span> New Session</button>
-                </div>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>ID</th><th>Customer</th><th>Computer</th><th>Start Time</th><th>Elapsed</th><th>Rate</th><th>Current Cost</th><th>Actions</th></tr></thead>
-                    <tbody id="activeSessionsTable"></tbody>
-                </table>
-            </div>
-        </div>
-        <div id="customers" class="section" style="display:none;">
-            <div class="header">
-                <h2>Customer Management</h2>
-                <div class="header-actions">
-                    <button class="btn btn-primary" onclick="openModal('addCustomerModal')"><span>+</span> Add Customer</button>
-                </div>
-            </div>
-            <div class="search-bar">
-                <input type="text" class="search-input" placeholder="Search customers..." id="customerSearch">
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Visits</th><th>Total Spent</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody id="customersTable"></tbody>
-                </table>
-            </div>
-        </div>
-        <div id="billing" class="section" style="display:none;">
-            <div class="header">
-                <h2>Billing & Invoices</h2>
-                <div class="header-actions">
-                    <button class="btn btn-primary">Export</button>
-                </div>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div><div class="stat-value naira">₦512,500</div><div class="stat-label">This Month</div></div>
-                        <div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg></div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div><div class="stat-value naira">₦1,882,000</div><div class="stat-label">This Year</div></div>
-                        <div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></div>
-                    </div>
-                </div>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>Invoice #</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
-                    <tbody id="billingTable"></tbody>
-                </table>
-            </div>
-        </div>
-        <div id="reports" class="section" style="display:none;">
-            <div class="header"><h2>Reports & Analytics</h2></div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div><div class="stat-value">85%</div><div class="stat-label">Occupancy Rate</div></div>
-                        <div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div><div class="stat-value">2.5h</div><div class="stat-label">Avg Session</div></div>
-                        <div class="stat-icon cyan"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div><div class="stat-value">156</div><div class="stat-label">Total Customers</div></div>
-                        <div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="settings" class="section" style="display:none;">
-            <div class="header"><h2>System Settings</h2></div>
-            <div class="table-container">
-                <h3 style="margin-bottom:20px;">Pricing Configuration (Naira)</h3>
-                <div class="form-row">
-                    <div class="form-group"><label>Standard Rate (per hour)</label><div class="form-control" style="display:flex;align-items:center;"><span class="naira" style="margin-right:5px;">₦</span><input type="number" value="500.00" step="0.01" style="background:transparent;border:none;color:var(--light);width:100%;outline:none;"></div></div>
-                    <div class="form-group"><label>VIP Rate (per hour)</label><div class="form-control" style="display:flex;align-items:center;"><span class="naira" style="margin-right:5px;">₦</span><input type="number" value="400.00" step="0.01" style="background:transparent;border:none;color:var(--light);width:100%;outline:none;"></div></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Minimum Charge</label><div class="form-control" style="display:flex;align-items:center;"><span class="naira" style="margin-right:5px;">₦</span><input type="number" value="100.00" step="0.01" style="background:transparent;border:none;color:var(--light);width:100%;outline:none;"></div></div>
-                    <div class="form-group"><label>Discount Threshold (hours)</label><input type="number" class="form-control" value="3"></div>
-                </div>
-                <button class="btn btn-primary" style="margin-top:20px;">Save Settings</button>
-            </div>
-        </div>
-    </main>
-    <div class="modal-overlay" id="newSessionModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Start New Session</h3>
-                <button class="close-btn" onclick="closeModal('newSessionModal')">&times;</button>
-            </div>
-            <form id="newSessionForm">
-                <div class="form-group"><label>Customer</label><select class="form-control" id="sessionCustomer"><option value="">Select Customer</option></select></div>
-                <div class="form-group"><label>Computer</label><select class="form-control" id="sessionComputer"><option value="">Select Computer</option></select></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Rate Type</label><select class="form-control" id="rateType"><option value="standard">Standard (₦500/hr)</option><option value="vip">VIP (₦400/hr)</option></select></div>
-                    <div class="form-group"><label>Prepaid Amount (₦)</label><input type="number" class="form-control" id="prepaidAmount" placeholder="Optional"></div>
-                </div>
-                <div style="display:flex;gap:10px;margin-top:25px;">
-                    <button type="button" class="btn btn-success" style="flex:1;" onclick="startSession()">Start Session</button>
-                    <button type="button" class="btn" style="flex:1;background:var(--gray);color:white;" onclick="closeModal('newSessionModal')">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="modal-overlay" id="addComputerModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Add New Computer</h3>
-                <button class="close-btn" onclick="closeModal('addComputerModal')">&times;</button>
-            </div>
-            <form>
-                <div class="form-group"><label>Computer Name</label><input type="text" class="form-control" placeholder="e.g., PC-01"></div>
-                <div class="form-group"><label>Specifications</label><input type="text" class="form-control" placeholder="e.g., i5, 16GB RAM, RTX 3060"></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Type</label><select class="form-control"><option>Standard</option><option>Gaming</option><option>Workstation</option></select></div>
-                    <div class="form-group"><label>Zone</label><select class="form-control"><option>Main Floor</option><option>VIP Area</option><option>Private Room</option></select></div>
-                </div>
-                <button type="button" class="btn btn-primary" style="width:100%;margin-top:20px;">Add Computer</button>
-            </form>
-        </div>
-    </div>
-    <div class="modal-overlay" id="addCustomerModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Add New Customer</h3>
-                <button class="close-btn" onclick="closeModal('addCustomerModal')">&times;</button>
-            </div>
-            <form>
-                <div class="form-row">
-                    <div class="form-group"><label>First Name</label><input type="text" class="form-control" placeholder="First name"></div>
-                    <div class="form-group"><label>Last Name</label><input type="text" class="form-control" placeholder="Last name"></div>
-                </div>
-                <div class="form-group"><label>Phone Number</label><input type="tel" class="form-control" placeholder="+234 800 000 0000"></div>
-                <div class="form-group"><label>Email</label><input type="email" class="form-control" placeholder="customer@email.com"></div>
-                <div class="form-group"><label>Membership Type</label><select class="form-control"><option>Regular</option><option>VIP</option><option>Premium</option></select></div>
-                <button type="button" class="btn btn-primary" style="width:100%;margin-top:20px;">Save Customer</button>
-            </form>
-        </div>
-    </div>
-    <script>
-        let computers = [
-            { id: 1, name: 'PC-01', status: 'available', specs: 'i5, 16GB, RTX 3060', type: 'Gaming', zone: 'Main Floor' },
-            { id: 2, name: 'PC-02', status: 'occupied', specs: 'i7, 32GB, RTX 4070', type: 'Gaming', zone: 'Main Floor' },
-            { id: 3, name: 'PC-03', status: 'available', specs: 'i5, 16GB, GTX 1660', type: 'Standard', zone: 'Main Floor' },
-            { id: 4, name: 'PC-04', status: 'occupied', specs: 'i9, 64GB, RTX 4090', type: 'Gaming', zone: 'VIP Area' },
-            { id: 5, name: 'PC-05', status: 'maintenance', specs: 'i5, 16GB, RTX 3060', type: 'Standard', zone: 'Main Floor' },
-            { id: 6, name: 'PC-06', status: 'available', specs: 'i7, 32GB, RTX 4070', type: 'Gaming', zone: 'Main Floor' },
-            { id: 7, name: 'PC-07', status: 'occupied', specs: 'i5, 16GB, GTX 1660', type: 'Standard', zone: 'Main Floor' },
-            { id: 8, name: 'PC-08', status: 'available', specs: 'i9, 64GB, RTX 4090', type: 'Workstation', zone: 'VIP Area' },
-            { id: 9, name: 'PC-09', status: 'occupied', specs: 'i7, 32GB, RTX 4070', type: 'Gaming', zone: 'Main Floor' },
-            { id: 10, name: 'PC-10', status: 'available', specs: 'i5, 16GB, RTX 3060', type: 'Standard', zone: 'Main Floor' },
-            { id: 11, name: 'PC-11', status: 'occupied', specs: 'i7, 32GB, RTX 4070', type: 'Gaming', zone: 'Private Room' },
-            { id: 12, name: 'PC-12', status: 'available', specs: 'i9, 64GB, RTX 4090', type: 'Workstation', zone: 'VIP Area' },
-            { id: 13, name: 'PC-13', status: 'occupied', specs: 'i5, 16GB, GTX 1660', type: 'Standard', zone: 'Main Floor' },
-            { id: 14, name: 'PC-14', status: 'available', specs: 'i7, 32GB, RTX 4070', type: 'Gaming', zone: 'Main Floor' },
-            { id: 15, name: 'PC-15', status: 'occupied', specs: 'i5, 16GB, RTX 3060', type: 'Standard', zone: 'Main Floor' },
-            { id: 16, name: 'PC-16', status: 'available', specs: 'i9, 64GB, RTX 4090', type: 'Workstation', zone: 'VIP Area' }
-        ];
-        let customers = [
-            { id: 1, name: 'Halimat Hamza', phone: '+234 801 234 5678', email: 'leemah@email.com', visits: 45, spent: 47500, status: 'active', membership: 'VIP' },
-            { id: 2, name: 'Usman Yusuf', phone: '+234 802 345 6789', email: 'usman@email.com', visits: 28, spent: 26700, status: 'active', membership: 'Regular' },
-            { id: 3, name: 'Idris Abdullahi', phone: '+234 803 456 7890', email: 'idris@email.com', visits: 67, spent: 77100, status: 'active', membership: 'Premium' },
-            { id: 4, name: 'Fatima Muhammad', phone: '+234 804 567 8901', email: 'fatima@email.com', visits: 15, spent: 14100, status: 'inactive', membership: 'Regular' },
-            { id: 5, name: 'Ridwan Adediran', phone: '+234 805 678 9012', email: 'ridade@email.com', visits: 89, spent: 111250, status: 'active', membership: 'VIP' }
-        ];
-        let sessions = [
-            { id: 1, customerId: 1, computerId: 2, startTime: new Date(Date.now() - 3600000), rate: 500, prepaid: 2000, status: 'active' },
-            { id: 2, customerId: 3, computerId: 4, startTime: new Date(Date.now() - 7200000), rate: 400, prepaid: 3000, status: 'active' },
-            { id: 3, customerId: 5, computerId: 7, startTime: new Date(Date.now() - 1800000), rate: 500, prepaid: 1500, status: 'active' },
-            { id: 4, customerId: 2, computerId: 9, startTime: new Date(Date.now() - 5400000), rate: 500, prepaid: 2500, status: 'active' },
-            { id: 5, customerId: 1, computerId: 11, startTime: new Date(Date.now() - 900000), rate: 400, prepaid: 1000, status: 'active' },
-            { id: 6, customerId: 3, computerId: 13, startTime: new Date(Date.now() - 10800000), rate: 500, prepaid: 5000, status: 'active' },
-            { id: 7, customerId: 5, computerId: 15, startTime: new Date(Date.now() - 2700000), rate: 500, prepaid: 2000, status: 'active' }
-        ];
-        let billingRecords = [
-            { id: 'INV-001', customer: 'Halimat Hamza', date: '2026-05-05', items: 3, total: 6750.00, payment: 'Cash', status: 'paid' },
-            { id: 'INV-002', customer: 'Usman Yusuf', date: '2026-05-05', items: 2, total: 4275.00, payment: 'Card', status: 'paid' },
-            { id: 'INV-003', customer: 'Idris Abdullahi', date: '2026-05-04', items: 5, total: 9300.00, payment: 'Card', status: 'paid' },
-            { id: 'INV-004', customer: 'Fatima Muhammad', date: '2026-05-04', items: 1, total: 1800.00, payment: 'Cash', status: 'paid' },
-            { id: 'INV-005', customer: 'Ridwan Adediran', date: '2026-05-03', items: 4, total: 8250.00, payment: 'Card', status: 'paid' }
-        ];
-        function formatNaira(amount) {
-            return '₦' + amount.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        }
-        function showSection(sectionId, event) {
-            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-            document.getElementById(sectionId).style.display = 'block';
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            event.target.closest('.nav-item').classList.add('active');
-            if (sectionId === 'computers') renderAllComputers();
-            if (sectionId === 'sessions') renderActiveSessions();
-            if (sectionId === 'customers') { renderCustomers(); setupCustomerSearch(); }
-            if (sectionId === 'billing') renderBilling();
-        }
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            if (modalId === 'newSessionModal') populateSessionDropdowns();
-        }
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-        function renderComputers() {
-            const grid = document.getElementById('computerGrid');
-            grid.innerHTML = computers.slice(0, 8).map(pc => `
-                <div class="computer-card ${pc.status}">
-                    <div class="computer-status ${pc.status}"></div>
-                    <div class="computer-icon">
-                        <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
-                    </div>
-                    <div class="computer-name">${pc.name}</div>
-                    <div class="computer-info">${pc.specs}</div>
-                    <div class="computer-info">${pc.zone}</div>
-                    ${getSessionTimer(pc.id)}
-                </div>
-            `).join('');
-        }
-        function renderAllComputers() {
-            const grid = document.getElementById('allComputersGrid');
-            grid.innerHTML = computers.map(pc => `
-                <div class="computer-card ${pc.status}">
-                    <div class="computer-status ${pc.status}"></div>
-                    <div class="computer-icon">
-                        <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
-                    </div>
-                    <div class="computer-name">${pc.name}</div>
-                    <div class="computer-info">${pc.specs}</div>
-                    <div class="computer-info">${pc.type} | ${pc.zone}</div>
-                    ${getSessionTimer(pc.id)}
-                </div>
-            `).join('');
-        }
-        function getSessionTimer(computerId) {
-            const session = sessions.find(s => s.computerId === computerId && s.status === 'active');
-            if (session) return `<div class="computer-timer" id="timer-${computerId}">00:00:00</div>`;
-            return `<div class="computer-info" style="margin-top:10px;text-transform:uppercase;font-weight:600;">${computers.find(c=>c.id===computerId)?.status}</div>`;
-        }
-        function renderRecentSessions() {
-            const tbody = document.getElementById('recentSessions');
-            tbody.innerHTML = sessions.slice(0, 5).map(s => {
-                const customer = customers.find(c => c.id === s.customerId);
-                const computer = computers.find(c => c.id === s.computerId);
-                const duration = formatDuration(new Date() - s.startTime);
-                const cost = calculateCost(s);
-                return `<tr><td><strong>${customer?.name||'Unknown'}</strong></td><td>${computer?.name||'Unknown'}</td><td>${formatTime(s.startTime)}</td><td>${duration}</td><td class="naira">${formatNaira(cost)}</td><td><span class="badge badge-success">Active</span></td></tr>`;
-            }).join('');
-        }
-        function renderActiveSessions() {
-            const tbody = document.getElementById('activeSessionsTable');
-            tbody.innerHTML = sessions.filter(s => s.status === 'active').map(s => {
-                const customer = customers.find(c => c.id === s.customerId);
-                const computer = computers.find(c => c.id === s.computerId);
-                return `<tr><td>#${s.id}</td><td>${customer?.name||'Unknown'}</td><td>${computer?.name||'Unknown'}</td><td>${formatTime(s.startTime)}</td><td class="timer-display" id="session-timer-${s.id}">00:00:00</td><td class="naira">₦${s.rate}/hr</td><td class="naira" id="session-cost-${s.id}">₦0.00</td><td><button class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="extendSession(${s.id})">Extend</button><button class="btn btn-danger" style="padding:6px 12px;font-size:12px;" onclick="endSession(${s.id})">End</button></td></tr>`;
-            }).join('');
-        }
-        function renderCustomers() {
-            const tbody = document.getElementById('customersTable');
-            tbody.innerHTML = customers.map(c => `<tr><td>#${c.id}</td><td><strong>${c.name}</strong></td><td>${c.phone}</td><td>${c.email}</td><td>${c.visits}</td><td class="naira">${formatNaira(c.spent)}</td><td><span class="badge ${c.status==='active'?'badge-success':'badge-warning'}">${c.status}</span></td><td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;">Edit</button></td></tr>`).join('');
-        }
-        function renderBilling() {
-            const tbody = document.getElementById('billingTable');
-            tbody.innerHTML = billingRecords.map(b => `<tr><td><strong>${b.id}</strong></td><td>${b.customer}</td><td>${b.date}</td><td>${b.items}</td><td class="naira">${formatNaira(b.total)}</td><td>${b.payment}</td><td><span class="badge badge-success">${b.status}</span></td></tr>`).join('');
-        }
-        function formatDuration(ms) {
-            const hours = Math.floor(ms/3600000);
-            const minutes = Math.floor((ms%3600000)/60000);
-            return `${hours}h ${minutes}m`;
-        }
-        function formatTime(date) {
-            return date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-        }
-        function calculateCost(session) {
-            const end = session.endTime || new Date();
-            return ((end - session.startTime) / 3600000) * session.rate;
-        }
-        function populateSessionDropdowns() {
-            document.getElementById('sessionCustomer').innerHTML = '<option value="">Select Customer</option>'+customers.map(c=>`<option value="${c.id}">${c.name} (${c.membership})</option>`).join('');
-            document.getElementById('sessionComputer').innerHTML = '<option value="">Select Computer</option>'+computers.filter(c=>c.status==='available').map(c=>`<option value="${c.id}">${c.name} - ${c.specs}</option>`).join('');
-        }
-        function startSession() {
-            const customerId = parseInt(document.getElementById('sessionCustomer').value);
-            const computerId = parseInt(document.getElementById('sessionComputer').value);
-            const rateType = document.getElementById('rateType').value;
-            const prepaid = parseFloat(document.getElementById('prepaidAmount').value)||0;
-            if (!customerId||!computerId) { alert('Please select both customer and computer'); return; }
-            sessions.push({id:sessions.length+1,customerId,computerId,startTime:new Date(),rate:rateType==='vip'?400:500,prepaid,status:'active'});
-            const computer = computers.find(c=>c.id===computerId);
-            if (computer) computer.status='occupied';
-            closeModal('newSessionModal');
-            renderComputers(); renderRecentSessions(); updateStats();
-            alert('Session started successfully!');
-        }
-        function endSession(sessionId) {
-            const session = sessions.find(s=>s.id===sessionId);
-            if (session) {
-                session.status='completed'; session.endTime=new Date();
-                const computer = computers.find(c=>c.id===session.computerId);
-                if (computer) computer.status='available';
-                const cost = calculateCost(session);
-                const customer = customers.find(c=>c.id===session.customerId);
-                if (customer) { customer.spent+=cost; customer.visits++; }
-                renderComputers(); renderActiveSessions(); renderRecentSessions(); updateStats();
-                alert(`Session ended. Total cost: ${formatNaira(cost)}`);
-            }
-        }
-        function extendSession(sessionId) {
-            const session = sessions.find(s=>s.id===sessionId);
-            if (session) {
-                const amount = parseFloat(prompt('Enter amount to add (₦):'));
-                if (amount>0) { session.prepaid+=amount; alert(`Added ${formatNaira(amount)} to session`); }
-            }
-        }
-        function updateStats() {
-            document.getElementById('activeComputers').textContent = computers.filter(c=>c.status==='occupied').length;
-            document.getElementById('availableComputers').textContent = computers.filter(c=>c.status==='available').length;
-            document.getElementById('activeSessions').textContent = sessions.filter(s=>s.status==='active').length;
-            const revenue = sessions.filter(s=>s.status==='active').reduce((sum,s)=>sum+calculateCost(s),0);
-            document.getElementById('totalRevenue').textContent = formatNaira(revenue);
-        }
-        setInterval(()=>{
-            sessions.filter(s=>s.status==='active').forEach(s=>{
-                const elapsed = new Date()-s.startTime;
-                const h=String(Math.floor(elapsed/3600000)).padStart(2,'0');
-                const m=String(Math.floor((elapsed%3600000)/60000)).padStart(2,'0');
-                const sec=String(Math.floor((elapsed%60000)/1000)).padStart(2,'0');
-                const timeStr = `${h}:${m}:${sec}`;
-                const t1=document.getElementById(`timer-${s.computerId}`);
-                if(t1) t1.textContent=timeStr;
-                const t2=document.getElementById(`session-timer-${s.id}`);
-                if(t2) t2.textContent=timeStr;
-                const c=document.getElementById(`session-cost-${s.id}`);
-                if(c) c.textContent=formatNaira(calculateCost(s));
-            });
-        },1000);
-        function filterComputers() {
-            const search = document.getElementById('computerSearch').value.toLowerCase();
-            const filtered = computers.filter(c=>c.name.toLowerCase().includes(search)||c.specs.toLowerCase().includes(search)||c.zone.toLowerCase().includes(search));
-            document.getElementById('allComputersGrid').innerHTML = filtered.map(pc=>`
-                <div class="computer-card ${pc.status}">
-                    <div class="computer-status ${pc.status}"></div>
-                    <div class="computer-icon"><svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg></div>
-                    <div class="computer-name">${pc.name}</div>
-                    <div class="computer-info">${pc.specs}</div>
-                    <div class="computer-info">${pc.type} | ${pc.zone}</div>
-                </div>
-            `).join('');
-        }
-        function setupCustomerSearch() {
-            const el = document.getElementById('customerSearch');
-            if (!el || el._searchBound) return;
-            el._searchBound = true;
-            el.addEventListener('input', function() {
-                const search = this.value.toLowerCase();
-                const filtered = customers.filter(c =>
-                    c.name.toLowerCase().includes(search) ||
-                    c.phone.includes(search) ||
-                    c.email.toLowerCase().includes(search)
-                );
-                document.getElementById('customersTable').innerHTML = filtered.map(c =>
-                    `<tr><td>#${c.id}</td><td><strong>${c.name}</strong></td><td>${c.phone}</td><td>${c.email}</td><td>${c.visits}</td><td class="naira">${formatNaira(c.spent)}</td><td><span class="badge ${c.status==='active'?'badge-success':'badge-warning'}">${c.status}</span></td><td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;">Edit</button></td></tr>`
-                ).join('');
-            });
-        }
-        document.addEventListener('DOMContentLoaded',()=>{renderComputers();renderRecentSessions();updateStats();});
-        document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active');}));
-    </script>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
+            <h1>CyberCafe Pro</h1>
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-item active" onclick="showSection('dashboard', event)">
+                <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" onclick="showSection('computers', event)">
+                <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
+                <span>Computers</span>
+            </div>
+            <div class="nav-item" onclick="showSection('sessions', event)">
+                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                <span>Active Sessions</span>
+            </div>
+            <div class="nav-item" onclick="showSection('customers', event)">
+                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                <span>Customers</span>
+            </div>
+            <div class="nav-item" onclick="showSection('billing', event)">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                <span>Billing</span>
+            </div>
+            <div class="nav-item" onclick="showSection('reports', event)">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                <span>Reports</span>
+            </div>
+            <div class="nav-item" onclick="showSection('settings', event)">
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L3.16 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                <span>Settings</span>
+            </div>
+        </nav>
+    </aside>
+    <main class="main-content">
+        <div id="dashboard" class="section">
+            <div class="header">
+                <h2>Dashboard Overview</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openModal('newSessionModal')">
+                        <span>+</span> New Session
+                    </button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="activeComputers">8</div>
+                            <div class="stat-label">Active Computers</div>
+                        </div>
+                        <div class="stat-icon purple">
+                            <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
+                        </div>
+                    </div>
+                    <div class="stat-change positive">+ 12% from yesterday</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value naira" id="totalRevenue">₦185,000</div>
+                            <div class="stat-label">Today's Revenue</div>
+                        </div>
+                        <div class="stat-icon green">
+                            <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                        </div>
+                    </div>
+                    <div class="stat-change positive">+ 8% from yesterday</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="activeSessions">7</div>
+                            <div class="stat-label">Active Sessions</div>
+                        </div>
+                        <div class="stat-icon cyan">
+                            <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                        </div>
+                    </div>
+                    <div class="stat-change positive">+ 5 new today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="availableComputers">8</div>
+                            <div class="stat-label">Available</div>
+                        </div>
+                        <div class="stat-icon orange">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </div>
+                    </div>
+                    <div class="stat-change">Same as yesterday</div>
+                </div>
+            </div>
+            <h3 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary)"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
+                Computer Status
+            </h3>
+            <div class="computers-grid" id="computerGrid"></div>
+            <h3 class="section-title" style="margin-top:30px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary)"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                Recent Sessions
+            </h3>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Customer</th><th>Computer</th><th>Start Time</th><th>Duration</th><th>Amount</th><th>Status</th></tr></thead>
+                    <tbody id="recentSessions"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="computers" class="section" style="display:none;">
+            <div class="header">
+                <h2>Computer Management</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openModal('addComputerModal')"><span>+</span> Add Computer</button>
+                </div>
+            </div>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search computers..." id="computerSearch">
+                <button class="btn btn-primary" onclick="filterComputers()">Search</button>
+            </div>
+            <div class="computers-grid" id="allComputersGrid"></div>
+        </div>
+        <div id="sessions" class="section" style="display:none;">
+            <div class="header">
+                <h2>Active Sessions</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openModal('newSessionModal')"><span>+</span> New Session</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Customer</th><th>Computer</th><th>Start Time</th><th>Elapsed</th><th>Rate</th><th>Current Cost</th><th>Actions</th></tr></thead>
+                    <tbody id="activeSessionsTable"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="customers" class="section" style="display:none;">
+            <div class="header">
+                <h2>Customer Management</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openModal('addCustomerModal')"><span>+</span> Add Customer</button>
+                </div>
+            </div>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search customers..." id="customerSearch">
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Visits</th><th>Total Spent</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="customersTable"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="billing" class="section" style="display:none;">
+            <div class="header">
+                <h2>Billing & Invoices</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary">Export</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div><div class="stat-value naira">₦512,500</div><div class="stat-label">This Month</div></div>
+                        <div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div><div class="stat-value naira">₦1,882,000</div><div class="stat-label">This Year</div></div>
+                        <div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Invoice #</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
+                    <tbody id="billingTable"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="reports" class="section" style="display:none;">
+            <div class="header"><h2>Reports & Analytics</h2></div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div><div class="stat-value">85%</div><div class="stat-label">Occupancy Rate</div></div>
+                        <div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div><div class="stat-value">2.5h</div><div class="stat-label">Avg Session</div></div>
+                        <div class="stat-icon cyan"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div><div class="stat-value">156</div><div class="stat-label">Total Customers</div></div>
+                        <div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="settings" class="section" style="display:none;">
+            <div class="header"><h2>System Settings</h2></div>
+            <div class="table-container">
+                <h3 style="margin-bottom:20px;">Pricing Configuration (Naira)</h3>
+                <div class="form-row">
+                    <div class="form-group"><label>Standard Rate (per hour)</label><div class="form-control" style="display:flex;align-items:center;"><span class="naira" style="margin-right:5px;">₦</span><input type="number" value="500.00" step="0.01" style="background:transparent;border:none;color:var(--light);width:100%;outline:none;"></div></div>
+                    <div class="form-group"><label>VIP Rate (per hour)</label><div class="form-control" style="display:flex;align-items:center;"><span class="naira" style="margin-right:5px;">₦</span><input type="number" value="400.00" step="0.01" style="background:transparent;border:none;color:var(--light);width:100%;outline:none;"></div></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Minimum Charge</label><div class="form-control" style="display:flex;align-items:center;"><span class="naira" style="margin-right:5px;">₦</span><input type="number" value="100.00" step="0.01" style="background:transparent;border:none;color:var(--light);width:100%;outline:none;"></div></div>
+                    <div class="form-group"><label>Discount Threshold (hours)</label><input type="number" class="form-control" value="3"></div>
+                </div>
+                <button class="btn btn-primary" style="margin-top:20px;">Save Settings</button>
+            </div>
+        </div>
+    </main>
+    <div class="modal-overlay" id="newSessionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Start New Session</h3>
+                <button class="close-btn" onclick="closeModal('newSessionModal')">&times;</button>
+            </div>
+            <form id="newSessionForm">
+                <div class="form-group"><label>Customer</label><select class="form-control" id="sessionCustomer"><option value="">Select Customer</option></select></div>
+                <div class="form-group"><label>Computer</label><select class="form-control" id="sessionComputer"><option value="">Select Computer</option></select></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Rate Type</label><select class="form-control" id="rateType"><option value="standard">Standard (₦500/hr)</option><option value="vip">VIP (₦400/hr)</option></select></div>
+                    <div class="form-group"><label>Prepaid Amount (₦)</label><input type="number" class="form-control" id="prepaidAmount" placeholder="Optional"></div>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:25px;">
+                    <button type="button" class="btn btn-success" style="flex:1;" onclick="startSession()">Start Session</button>
+                    <button type="button" class="btn" style="flex:1;background:var(--gray);color:white;" onclick="closeModal('newSessionModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-overlay" id="addComputerModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add New Computer</h3>
+                <button class="close-btn" onclick="closeModal('addComputerModal')">&times;</button>
+            </div>
+            <form>
+                <div class="form-group"><label>Computer Name</label><input type="text" class="form-control" placeholder="e.g., PC-01"></div>
+                <div class="form-group"><label>Specifications</label><input type="text" class="form-control" placeholder="e.g., i5, 16GB RAM, RTX 3060"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Type</label><select class="form-control"><option>Standard</option><option>Gaming</option><option>Workstation</option></select></div>
+                    <div class="form-group"><label>Zone</label><select class="form-control"><option>Main Floor</option><option>VIP Area</option><option>Private Room</option></select></div>
+                </div>
+                <button type="button" class="btn btn-primary" style="width:100%;margin-top:20px;">Add Computer</button>
+            </form>
+        </div>
+    </div>
+    <div class="modal-overlay" id="addCustomerModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add New Customer</h3>
+                <button class="close-btn" onclick="closeModal('addCustomerModal')">&times;</button>
+            </div>
+            <form>
+                <div class="form-row">
+                    <div class="form-group"><label>First Name</label><input type="text" class="form-control" placeholder="First name"></div>
+                    <div class="form-group"><label>Last Name</label><input type="text" class="form-control" placeholder="Last name"></div>
+                </div>
+                <div class="form-group"><label>Phone Number</label><input type="tel" class="form-control" placeholder="+234 800 000 0000"></div>
+                <div class="form-group"><label>Email</label><input type="email" class="form-control" placeholder="customer@email.com"></div>
+                <div class="form-group"><label>Membership Type</label><select class="form-control"><option>Regular</option><option>VIP</option><option>Premium</option></select></div>
+                <button type="button" class="btn btn-primary" style="width:100%;margin-top:20px;">Save Customer</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        let computers = [
+            { id: 1, name: 'PC-01', status: 'available', specs: 'i5, 16GB, RTX 3060', type: 'Gaming', zone: 'Main Floor' },
+            { id: 2, name: 'PC-02', status: 'occupied', specs: 'i7, 32GB, RTX 4070', type: 'Gaming', zone: 'Main Floor' },
+            { id: 3, name: 'PC-03', status: 'available', specs: 'i5, 16GB, GTX 1660', type: 'Standard', zone: 'Main Floor' },
+            { id: 4, name: 'PC-04', status: 'occupied', specs: 'i9, 64GB, RTX 4090', type: 'Gaming', zone: 'VIP Area' },
+            { id: 5, name: 'PC-05', status: 'maintenance', specs: 'i5, 16GB, RTX 3060', type: 'Standard', zone: 'Main Floor' },
+            { id: 6, name: 'PC-06', status: 'available', specs: 'i7, 32GB, RTX 4070', type: 'Gaming', zone: 'Main Floor' },
+            { id: 7, name: 'PC-07', status: 'occupied', specs: 'i5, 16GB, GTX 1660', type: 'Standard', zone: 'Main Floor' },
+            { id: 8, name: 'PC-08', status: 'available', specs: 'i9, 64GB, RTX 4090', type: 'Workstation', zone: 'VIP Area' },
+            { id: 9, name: 'PC-09', status: 'occupied', specs: 'i7, 32GB, RTX 4070', type: 'Gaming', zone: 'Main Floor' },
+            { id: 10, name: 'PC-10', status: 'available', specs: 'i5, 16GB, RTX 3060', type: 'Standard', zone: 'Main Floor' },
+            { id: 11, name: 'PC-11', status: 'occupied', specs: 'i7, 32GB, RTX 4070', type: 'Gaming', zone: 'Private Room' },
+            { id: 12, name: 'PC-12', status: 'available', specs: 'i9, 64GB, RTX 4090', type: 'Workstation', zone: 'VIP Area' },
+            { id: 13, name: 'PC-13', status: 'occupied', specs: 'i5, 16GB, GTX 1660', type: 'Standard', zone: 'Main Floor' },
+            { id: 14, name: 'PC-14', status: 'available', specs: 'i7, 32GB, RTX 4070', type: 'Gaming', zone: 'Main Floor' },
+            { id: 15, name: 'PC-15', status: 'occupied', specs: 'i5, 16GB, RTX 3060', type: 'Standard', zone: 'Main Floor' },
+            { id: 16, name: 'PC-16', status: 'available', specs: 'i9, 64GB, RTX 4090', type: 'Workstation', zone: 'VIP Area' }
+        ];
+        let customers = [
+            { id: 1, name: 'John Smith', phone: '+234 801 234 5678', email: 'john@email.com', visits: 45, spent: 47500, status: 'active', membership: 'VIP' },
+            { id: 2, name: 'Sarah Johnson', phone: '+234 802 345 6789', email: 'sarah@email.com', visits: 28, spent: 26700, status: 'active', membership: 'Regular' },
+            { id: 3, name: 'Mike Davis', phone: '+234 803 456 7890', email: 'mike@email.com', visits: 67, spent: 77100, status: 'active', membership: 'Premium' },
+            { id: 4, name: 'Emily Brown', phone: '+234 804 567 8901', email: 'emily@email.com', visits: 15, spent: 14100, status: 'inactive', membership: 'Regular' },
+            { id: 5, name: 'David Wilson', phone: '+234 805 678 9012', email: 'david@email.com', visits: 89, spent: 111250, status: 'active', membership: 'VIP' }
+        ];
+        let sessions = [
+            { id: 1, customerId: 1, computerId: 2, startTime: new Date(Date.now() - 3600000), rate: 500, prepaid: 2000, status: 'active' },
+            { id: 2, customerId: 3, computerId: 4, startTime: new Date(Date.now() - 7200000), rate: 400, prepaid: 3000, status: 'active' },
+            { id: 3, customerId: 5, computerId: 7, startTime: new Date(Date.now() - 1800000), rate: 500, prepaid: 1500, status: 'active' },
+            { id: 4, customerId: 2, computerId: 9, startTime: new Date(Date.now() - 5400000), rate: 500, prepaid: 2500, status: 'active' },
+            { id: 5, customerId: 1, computerId: 11, startTime: new Date(Date.now() - 900000), rate: 400, prepaid: 1000, status: 'active' },
+            { id: 6, customerId: 3, computerId: 13, startTime: new Date(Date.now() - 10800000), rate: 500, prepaid: 5000, status: 'active' },
+            { id: 7, customerId: 5, computerId: 15, startTime: new Date(Date.now() - 2700000), rate: 500, prepaid: 2000, status: 'active' }
+        ];
+        let billingRecords = [
+            { id: 'INV-001', customer: 'John Smith', date: '2026-05-05', items: 3, total: 6750.00, payment: 'Cash', status: 'paid' },
+            { id: 'INV-002', customer: 'Sarah Johnson', date: '2026-05-05', items: 2, total: 4275.00, payment: 'Card', status: 'paid' },
+            { id: 'INV-003', customer: 'Mike Davis', date: '2026-05-04', items: 5, total: 9300.00, payment: 'Card', status: 'paid' },
+            { id: 'INV-004', customer: 'Emily Brown', date: '2026-05-04', items: 1, total: 1800.00, payment: 'Cash', status: 'paid' },
+            { id: 'INV-005', customer: 'David Wilson', date: '2026-05-03', items: 4, total: 8250.00, payment: 'Card', status: 'paid' }
+        ];
+        function formatNaira(amount) {
+            return '₦' + amount.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        function showSection(sectionId, event) {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.getElementById(sectionId).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+            if (sectionId === 'computers') renderAllComputers();
+            if (sectionId === 'sessions') renderActiveSessions();
+            if (sectionId === 'customers') { renderCustomers(); setupCustomerSearch(); }
+            if (sectionId === 'billing') renderBilling();
+        }
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            if (modalId === 'newSessionModal') populateSessionDropdowns();
+        }
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        function renderComputers() {
+            const grid = document.getElementById('computerGrid');
+            grid.innerHTML = computers.slice(0, 8).map(pc => `
+                <div class="computer-card ${pc.status}">
+                    <div class="computer-status ${pc.status}"></div>
+                    <div class="computer-icon">
+                        <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
+                    </div>
+                    <div class="computer-name">${pc.name}</div>
+                    <div class="computer-info">${pc.specs}</div>
+                    <div class="computer-info">${pc.zone}</div>
+                    ${getSessionTimer(pc.id)}
+                </div>
+            `).join('');
+        }
+        function renderAllComputers() {
+            const grid = document.getElementById('allComputersGrid');
+            grid.innerHTML = computers.map(pc => `
+                <div class="computer-card ${pc.status}">
+                    <div class="computer-status ${pc.status}"></div>
+                    <div class="computer-icon">
+                        <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
+                    </div>
+                    <div class="computer-name">${pc.name}</div>
+                    <div class="computer-info">${pc.specs}</div>
+                    <div class="computer-info">${pc.type} | ${pc.zone}</div>
+                    ${getSessionTimer(pc.id)}
+                </div>
+            `).join('');
+        }
+        function getSessionTimer(computerId) {
+            const session = sessions.find(s => s.computerId === computerId && s.status === 'active');
+            if (session) return `<div class="computer-timer" id="timer-${computerId}">00:00:00</div>`;
+            return `<div class="computer-info" style="margin-top:10px;text-transform:uppercase;font-weight:600;">${computers.find(c=>c.id===computerId)?.status}</div>`;
+        }
+        function renderRecentSessions() {
+            const tbody = document.getElementById('recentSessions');
+            tbody.innerHTML = sessions.slice(0, 5).map(s => {
+                const customer = customers.find(c => c.id === s.customerId);
+                const computer = computers.find(c => c.id === s.computerId);
+                const duration = formatDuration(new Date() - s.startTime);
+                const cost = calculateCost(s);
+                return `<tr><td><strong>${customer?.name||'Unknown'}</strong></td><td>${computer?.name||'Unknown'}</td><td>${formatTime(s.startTime)}</td><td>${duration}</td><td class="naira">${formatNaira(cost)}</td><td><span class="badge badge-success">Active</span></td></tr>`;
+            }).join('');
+        }
+        function renderActiveSessions() {
+            const tbody = document.getElementById('activeSessionsTable');
+            tbody.innerHTML = sessions.filter(s => s.status === 'active').map(s => {
+                const customer = customers.find(c => c.id === s.customerId);
+                const computer = computers.find(c => c.id === s.computerId);
+                return `<tr><td>#${s.id}</td><td>${customer?.name||'Unknown'}</td><td>${computer?.name||'Unknown'}</td><td>${formatTime(s.startTime)}</td><td class="timer-display" id="session-timer-${s.id}">00:00:00</td><td class="naira">₦${s.rate}/hr</td><td class="naira" id="session-cost-${s.id}">₦0.00</td><td><button class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="extendSession(${s.id})">Extend</button><button class="btn btn-danger" style="padding:6px 12px;font-size:12px;" onclick="endSession(${s.id})">End</button></td></tr>`;
+            }).join('');
+        }
+        function renderCustomers() {
+            const tbody = document.getElementById('customersTable');
+            tbody.innerHTML = customers.map(c => `<tr><td>#${c.id}</td><td><strong>${c.name}</strong></td><td>${c.phone}</td><td>${c.email}</td><td>${c.visits}</td><td class="naira">${formatNaira(c.spent)}</td><td><span class="badge ${c.status==='active'?'badge-success':'badge-warning'}">${c.status}</span></td><td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;">Edit</button></td></tr>`).join('');
+        }
+        function renderBilling() {
+            const tbody = document.getElementById('billingTable');
+            tbody.innerHTML = billingRecords.map(b => `<tr><td><strong>${b.id}</strong></td><td>${b.customer}</td><td>${b.date}</td><td>${b.items}</td><td class="naira">${formatNaira(b.total)}</td><td>${b.payment}</td><td><span class="badge badge-success">${b.status}</span></td></tr>`).join('');
+        }
+        function formatDuration(ms) {
+            const hours = Math.floor(ms/3600000);
+            const minutes = Math.floor((ms%3600000)/60000);
+            return `${hours}h ${minutes}m`;
+        }
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+        }
+        function calculateCost(session) {
+            const end = session.endTime || new Date();
+            return ((end - session.startTime) / 3600000) * session.rate;
+        }
+        function populateSessionDropdowns() {
+            document.getElementById('sessionCustomer').innerHTML = '<option value="">Select Customer</option>'+customers.map(c=>`<option value="${c.id}">${c.name} (${c.membership})</option>`).join('');
+            document.getElementById('sessionComputer').innerHTML = '<option value="">Select Computer</option>'+computers.filter(c=>c.status==='available').map(c=>`<option value="${c.id}">${c.name} - ${c.specs}</option>`).join('');
+        }
+        function startSession() {
+            const customerId = parseInt(document.getElementById('sessionCustomer').value);
+            const computerId = parseInt(document.getElementById('sessionComputer').value);
+            const rateType = document.getElementById('rateType').value;
+            const prepaid = parseFloat(document.getElementById('prepaidAmount').value)||0;
+            if (!customerId||!computerId) { alert('Please select both customer and computer'); return; }
+            sessions.push({id:sessions.length+1,customerId,computerId,startTime:new Date(),rate:rateType==='vip'?400:500,prepaid,status:'active'});
+            const computer = computers.find(c=>c.id===computerId);
+            if (computer) computer.status='occupied';
+            closeModal('newSessionModal');
+            renderComputers(); renderRecentSessions(); updateStats();
+            alert('Session started successfully!');
+        }
+        function endSession(sessionId) {
+            const session = sessions.find(s=>s.id===sessionId);
+            if (session) {
+                session.status='completed'; session.endTime=new Date();
+                const computer = computers.find(c=>c.id===session.computerId);
+                if (computer) computer.status='available';
+                const cost = calculateCost(session);
+                const customer = customers.find(c=>c.id===session.customerId);
+                if (customer) { customer.spent+=cost; customer.visits++; }
+                renderComputers(); renderActiveSessions(); renderRecentSessions(); updateStats();
+                alert(`Session ended. Total cost: ${formatNaira(cost)}`);
+            }
+        }
+        function extendSession(sessionId) {
+            const session = sessions.find(s=>s.id===sessionId);
+            if (session) {
+                const amount = parseFloat(prompt('Enter amount to add (₦):'));
+                if (amount>0) { session.prepaid+=amount; alert(`Added ${formatNaira(amount)} to session`); }
+            }
+        }
+        function updateStats() {
+            document.getElementById('activeComputers').textContent = computers.filter(c=>c.status==='occupied').length;
+            document.getElementById('availableComputers').textContent = computers.filter(c=>c.status==='available').length;
+            document.getElementById('activeSessions').textContent = sessions.filter(s=>s.status==='active').length;
+            const revenue = sessions.filter(s=>s.status==='active').reduce((sum,s)=>sum+calculateCost(s),0);
+            document.getElementById('totalRevenue').textContent = formatNaira(revenue);
+        }
+        setInterval(()=>{
+            sessions.filter(s=>s.status==='active').forEach(s=>{
+                const elapsed = new Date()-s.startTime;
+                const h=String(Math.floor(elapsed/3600000)).padStart(2,'0');
+                const m=String(Math.floor((elapsed%3600000)/60000)).padStart(2,'0');
+                const sec=String(Math.floor((elapsed%60000)/1000)).padStart(2,'0');
+                const timeStr = `${h}:${m}:${sec}`;
+                const t1=document.getElementById(`timer-${s.computerId}`);
+                if(t1) t1.textContent=timeStr;
+                const t2=document.getElementById(`session-timer-${s.id}`);
+                if(t2) t2.textContent=timeStr;
+                const c=document.getElementById(`session-cost-${s.id}`);
+                if(c) c.textContent=formatNaira(calculateCost(s));
+            });
+        },1000);
+        function filterComputers() {
+            const search = document.getElementById('computerSearch').value.toLowerCase();
+            const filtered = computers.filter(c=>c.name.toLowerCase().includes(search)||c.specs.toLowerCase().includes(search)||c.zone.toLowerCase().includes(search));
+            document.getElementById('allComputersGrid').innerHTML = filtered.map(pc=>`
+                <div class="computer-card ${pc.status}">
+                    <div class="computer-status ${pc.status}"></div>
+                    <div class="computer-icon"><svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg></div>
+                    <div class="computer-name">${pc.name}</div>
+                    <div class="computer-info">${pc.specs}</div>
+                    <div class="computer-info">${pc.type} | ${pc.zone}</div>
+                </div>
+            `).join('');
+        }
+        function setupCustomerSearch() {
+            const el = document.getElementById('customerSearch');
+            if (!el || el._searchBound) return;
+            el._searchBound = true;
+            el.addEventListener('input', function() {
+                const search = this.value.toLowerCase();
+                const filtered = customers.filter(c =>
+                    c.name.toLowerCase().includes(search) ||
+                    c.phone.includes(search) ||
+                    c.email.toLowerCase().includes(search)
+                );
+                document.getElementById('customersTable').innerHTML = filtered.map(c =>
+                    `<tr><td>#${c.id}</td><td><strong>${c.name}</strong></td><td>${c.phone}</td><td>${c.email}</td><td>${c.visits}</td><td class="naira">${formatNaira(c.spent)}</td><td><span class="badge ${c.status==='active'?'badge-success':'badge-warning'}">${c.status}</span></td><td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;">Edit</button></td></tr>`
+                ).join('');
+            });
+        }
+        document.addEventListener('DOMContentLoaded',()=>{renderComputers();renderRecentSessions();updateStats();});
+        document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active');}));
+    </script>
 </body>
 </html>
