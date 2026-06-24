@@ -442,7 +442,7 @@
                 <div class="form-group"><label>Customer</label><select class="form-control" id="sessionCustomer"><option value="">Select Customer</option></select></div>
                 <div class="form-group"><label>Computer</label><select class="form-control" id="sessionComputer"><option value="">Select Computer</option></select></div>
                 <div class="form-row">
-                    <div class="form-group"><label>Rate Type</label><select class="form-control" id="rateType"><option value="standard">Standard (₦500/hr)</option><option value="vip">VIP (₦400/hr)</option></select></div>
+                    <div class="form-group"><label>Rate Type</label><select class="form-control" id="rateType"><option value="standard">Standard (₦400/hr)</option><option value="vip">VIP (₦400/hr)</option></select></div>
                     <div class="form-group"><label>Prepaid Amount (₦)</label><input type="number" class="form-control" id="prepaidAmount" placeholder="Optional"></div>
                 </div>
                 <div style="display:flex;gap:10px;margin-top:25px;">
@@ -507,9 +507,9 @@
             { id: 16, name: 'PC-16', status: 'available', specs: 'i9, 64GB, RTX 4090', type: 'Workstation', zone: 'VIP Area' }
         ];
         let customers = [
-            { id: 1, name: 'Hamza Halimat', phone: '+234 801 234 5678', email: 'leemah@email.com', visits: 45, spent: 47500, status: 'active', membership: 'VIP' },
+            { id: 1, name: 'Halimat Hamza', phone: '+234 801 234 5678', email: 'leemah@email.com', visits: 45, spent: 47500, status: 'active', membership: 'VIP' },
             { id: 2, name: 'Usman Yusuf', phone: '+234 802 345 6789', email: 'usman@email.com', visits: 28, spent: 26700, status: 'active', membership: 'Regular' },
-            { id: 3, name: 'Idris Abdullah', phone: '+234 803 456 7890', email: 'idris@email.com', visits: 67, spent: 77100, status: 'active', membership: 'Premium' },
+            { id: 3, name: 'Idris Abdullahi', phone: '+234 803 456 7890', email: 'idris@email.com', visits: 67, spent: 77100, status: 'active', membership: 'Premium' },
             { id: 4, name: 'Fatima Muhammad', phone: '+234 804 567 8901', email: 'fatima@email.com', visits: 15, spent: 14100, status: 'inactive', membership: 'Regular' },
             { id: 5, name: 'Ridwan Adediran', phone: '+234 805 678 9012', email: 'ridade@email.com', visits: 89, spent: 111250, status: 'active', membership: 'VIP' }
         ];
@@ -523,9 +523,9 @@
             { id: 7, customerId: 5, computerId: 15, startTime: new Date(Date.now() - 2700000), rate: 500, prepaid: 2000, status: 'active' }
         ];
         let billingRecords = [
-            { id: 'INV-001', customer: 'Hamza Halimat', date: '2026-05-05', items: 3, total: 6750.00, payment: 'Cash', status: 'paid' },
+            { id: 'INV-001', customer: 'Halimat Hamza', date: '2026-05-05', items: 3, total: 6750.00, payment: 'Cash', status: 'paid' },
             { id: 'INV-002', customer: 'Usman Yusuf', date: '2026-05-05', items: 2, total: 4275.00, payment: 'Card', status: 'paid' },
-            { id: 'INV-003', customer: 'Idris Abdullah', date: '2026-05-04', items: 5, total: 9300.00, payment: 'Card', status: 'paid' },
+            { id: 'INV-003', customer: 'Idris Abdullahi', date: '2026-05-04', items: 5, total: 9300.00, payment: 'Card', status: 'paid' },
             { id: 'INV-004', customer: 'Fatima Muhammad', date: '2026-05-04', items: 1, total: 1800.00, payment: 'Cash', status: 'paid' },
             { id: 'INV-005', customer: 'Ridwan Adediran', date: '2026-05-03', items: 4, total: 8250.00, payment: 'Card', status: 'paid' }
         ];
@@ -552,37 +552,37 @@
         function renderComputers() {
             const grid = document.getElementById('computerGrid');
             grid.innerHTML = computers.slice(0, 8).map(pc => `
-                <div class="computer-card ₦{pc.status}">
-                    <div class="computer-status ₦{pc.status}"></div>
+                <div class="computer-card ${pc.status}">
+                    <div class="computer-status ${pc.status}"></div>
                     <div class="computer-icon">
                         <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
                     </div>
-                    <div class="computer-name">₦{pc.name}</div>
-                    <div class="computer-info">₦{pc.specs}</div>
-                    <div class="computer-info">₦{pc.zone}</div>
-                    ₦{getSessionTimer(pc.id)}
+                    <div class="computer-name">${pc.name}</div>
+                    <div class="computer-info">${pc.specs}</div>
+                    <div class="computer-info">${pc.zone}</div>
+                    ${getSessionTimer(pc.id)}
                 </div>
             `).join('');
         }
         function renderAllComputers() {
             const grid = document.getElementById('allComputersGrid');
             grid.innerHTML = computers.map(pc => `
-                <div class="computer-card ₦{pc.status}">
-                    <div class="computer-status ₦{pc.status}"></div>
+                <div class="computer-card ${pc.status}">
+                    <div class="computer-status ${pc.status}"></div>
                     <div class="computer-icon">
                         <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
                     </div>
-                    <div class="computer-name">₦{pc.name}</div>
-                    <div class="computer-info">₦{pc.specs}</div>
-                    <div class="computer-info">₦{pc.type} | ${pc.zone}</div>
-                    ₦{getSessionTimer(pc.id)}
+                    <div class="computer-name">${pc.name}</div>
+                    <div class="computer-info">${pc.specs}</div>
+                    <div class="computer-info">${pc.type} | ${pc.zone}</div>
+                    ${getSessionTimer(pc.id)}
                 </div>
             `).join('');
         }
         function getSessionTimer(computerId) {
             const session = sessions.find(s => s.computerId === computerId && s.status === 'active');
-            if (session) return `<div class="computer-timer" id="timer-₦{computerId}">00:00:00</div>`;
-            return `<div class="computer-info" style="margin-top:10px;text-transform:uppercase;font-weight:600;">₦{computers.find(c=>c.id===computerId)?.status}</div>`;
+            if (session) return `<div class="computer-timer" id="timer-${computerId}">00:00:00</div>`;
+            return `<div class="computer-info" style="margin-top:10px;text-transform:uppercase;font-weight:600;">${computers.find(c=>c.id===computerId)?.status}</div>`;
         }
         function renderRecentSessions() {
             const tbody = document.getElementById('recentSessions');
@@ -591,7 +591,7 @@
                 const computer = computers.find(c => c.id === s.computerId);
                 const duration = formatDuration(new Date() - s.startTime);
                 const cost = calculateCost(s);
-                return `<tr><td><strong>₦{customer?.name||'Unknown'}</strong></td><td>₦{computer?.name||'Unknown'}</td><td>₦{formatTime(s.startTime)}</td><td>${duration}</td><td class="naira">${formatNaira(cost)}</td><td><span class="badge badge-success">Active</span></td></tr>`;
+                return `<tr><td><strong>${customer?.name||'Unknown'}</strong></td><td>${computer?.name||'Unknown'}</td><td>${formatTime(s.startTime)}</td><td>${duration}</td><td class="naira">${formatNaira(cost)}</td><td><span class="badge badge-success">Active</span></td></tr>`;
             }).join('');
         }
         function renderActiveSessions() {
@@ -599,21 +599,21 @@
             tbody.innerHTML = sessions.filter(s => s.status === 'active').map(s => {
                 const customer = customers.find(c => c.id === s.customerId);
                 const computer = computers.find(c => c.id === s.computerId);
-                return `<tr><td>#₦{s.id}</td><td>₦{customer?.name||'Unknown'}</td><td>₦{computer?.name||'Unknown'}</td><td>₦{formatTime(s.startTime)}</td><td class="timer-display" id="session-timer-${s.id}">00:00:00</td><td class="naira">₦${s.rate}/hr</td><td class="naira" id="session-cost-${s.id}">₦0.00</td><td><button class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="extendSession(${s.id})">Extend</button><button class="btn btn-danger" style="padding:6px 12px;font-size:12px;" onclick="endSession(${s.id})">End</button></td></tr>`;
+                return `<tr><td>#${s.id}</td><td>${customer?.name||'Unknown'}</td><td>${computer?.name||'Unknown'}</td><td>${formatTime(s.startTime)}</td><td class="timer-display" id="session-timer-${s.id}">00:00:00</td><td class="naira">₦${s.rate}/hr</td><td class="naira" id="session-cost-${s.id}">₦0.00</td><td><button class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="extendSession(${s.id})">Extend</button><button class="btn btn-danger" style="padding:6px 12px;font-size:12px;" onclick="endSession(${s.id})">End</button></td></tr>`;
             }).join('');
         }
         function renderCustomers() {
             const tbody = document.getElementById('customersTable');
-            tbody.innerHTML = customers.map(c => `<tr><td>#₦{c.id}</td><td><strong>₦{c.name}</strong></td><td>₦{c.phone}</td><td>₦{c.email}</td><td>${c.visits}</td><td class="naira">${formatNaira(c.spent)}</td><td><span class="badge ${c.status==='active'?'badge-success':'badge-warning'}">${c.status}</span></td><td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;">Edit</button></td></tr>`).join('');
+            tbody.innerHTML = customers.map(c => `<tr><td>#${c.id}</td><td><strong>${c.name}</strong></td><td>${c.phone}</td><td>${c.email}</td><td>${c.visits}</td><td class="naira">${formatNaira(c.spent)}</td><td><span class="badge ${c.status==='active'?'badge-success':'badge-warning'}">${c.status}</span></td><td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;">Edit</button></td></tr>`).join('');
         }
         function renderBilling() {
             const tbody = document.getElementById('billingTable');
-            tbody.innerHTML = billingRecords.map(b => `<tr><td><strong>₦{b.id}</strong></td><td>₦{b.customer}</td><td>₦{b.date}</td><td>₦{b.items}</td><td class="naira">${formatNaira(b.total)}</td><td>${b.payment}</td><td><span class="badge badge-success">${b.status}</span></td></tr>`).join('');
+            tbody.innerHTML = billingRecords.map(b => `<tr><td><strong>${b.id}</strong></td><td>${b.customer}</td><td>${b.date}</td><td>${b.items}</td><td class="naira">${formatNaira(b.total)}</td><td>${b.payment}</td><td><span class="badge badge-success">${b.status}</span></td></tr>`).join('');
         }
         function formatDuration(ms) {
             const hours = Math.floor(ms/3600000);
             const minutes = Math.floor((ms%3600000)/60000);
-            return `₦{hours}h ₦{minutes}m`;
+            return `${hours}h ${minutes}m`;
         }
         function formatTime(date) {
             return date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
@@ -649,14 +649,14 @@
                 const customer = customers.find(c=>c.id===session.customerId);
                 if (customer) { customer.spent+=cost; customer.visits++; }
                 renderComputers(); renderActiveSessions(); renderRecentSessions(); updateStats();
-                alert(`Session ended. Total cost: ₦{formatNaira(cost)}`);
+                alert(`Session ended. Total cost: ${formatNaira(cost)}`);
             }
         }
         function extendSession(sessionId) {
             const session = sessions.find(s=>s.id===sessionId);
             if (session) {
                 const amount = parseFloat(prompt('Enter amount to add (₦):'));
-                if (amount>0) { session.prepaid+=amount; alert(`Added ₦{formatNaira(amount)} to session`); }
+                if (amount>0) { session.prepaid+=amount; alert(`Added ${formatNaira(amount)} to session`); }
             }
         }
         function updateStats() {
@@ -672,12 +672,12 @@
                 const h=String(Math.floor(elapsed/3600000)).padStart(2,'0');
                 const m=String(Math.floor((elapsed%3600000)/60000)).padStart(2,'0');
                 const sec=String(Math.floor((elapsed%60000)/1000)).padStart(2,'0');
-                const timeStr = `₦{h}:₦{m}:₦{sec}`;
-                const t1=document.getElementById(`timer-₦{s.computerId}`);
+                const timeStr = `${h}:${m}:${sec}`;
+                const t1=document.getElementById(`timer-${s.computerId}`);
                 if(t1) t1.textContent=timeStr;
-                const t2=document.getElementById(`session-timer-₦{s.id}`);
+                const t2=document.getElementById(`session-timer-${s.id}`);
                 if(t2) t2.textContent=timeStr;
-                const c=document.getElementById(`session-cost-₦{s.id}`);
+                const c=document.getElementById(`session-cost-${s.id}`);
                 if(c) c.textContent=formatNaira(calculateCost(s));
             });
         },1000);
@@ -685,12 +685,12 @@
             const search = document.getElementById('computerSearch').value.toLowerCase();
             const filtered = computers.filter(c=>c.name.toLowerCase().includes(search)||c.specs.toLowerCase().includes(search)||c.zone.toLowerCase().includes(search));
             document.getElementById('allComputersGrid').innerHTML = filtered.map(pc=>`
-                <div class="computer-card ₦{pc.status}">
-                    <div class="computer-status ₦{pc.status}"></div>
+                <div class="computer-card ${pc.status}">
+                    <div class="computer-status ${pc.status}"></div>
                     <div class="computer-icon"><svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg></div>
-                    <div class="computer-name">₦{pc.name}</div>
-                    <div class="computer-info">₦{pc.specs}</div>
-                    <div class="computer-info">₦{pc.type} | ${pc.zone}</div>
+                    <div class="computer-name">${pc.name}</div>
+                    <div class="computer-info">${pc.specs}</div>
+                    <div class="computer-info">${pc.type} | ${pc.zone}</div>
                 </div>
             `).join('');
         }
@@ -706,7 +706,7 @@
                     c.email.toLowerCase().includes(search)
                 );
                 document.getElementById('customersTable').innerHTML = filtered.map(c =>
-                    `<tr><td>#₦{c.id}</td><td><strong>₦{c.name}</strong></td><td>₦{c.phone}</td><td>₦{c.email}</td><td>₦{c.visits}</td><td class="naira">${formatNaira(c.spent)}</td><td><span class="badge ${c.status==='active'?'badge-success':'badge-warning'}">${c.status}</span></td><td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;">Edit</button></td></tr>`
+                    `<tr><td>#${c.id}</td><td><strong>${c.name}</strong></td><td>${c.phone}</td><td>${c.email}</td><td>${c.visits}</td><td class="naira">${formatNaira(c.spent)}</td><td><span class="badge ${c.status==='active'?'badge-success':'badge-warning'}">${c.status}</span></td><td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;">Edit</button></td></tr>`
                 ).join('');
             });
         }
