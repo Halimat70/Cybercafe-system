@@ -440,19 +440,22 @@
             </div>
             <form id="newSessionForm">
                 <div class="form-group"><label>Customer</label><select class="form-control" id="sessionCustomer"><option value="">Select Customer</option></select></div>
-                <div class="form-group"><label>Computer</label><select class="form-control" id="sessionComputer"><option value="">Select Computer</option></select></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Rate Type</label><select class="form-control" id="rateType"><option value="standard">Standard (₦500/hr)</option><option value="vip">VIP (₦400/hr)</option></select></div>
-                    <div class="form-group"><label>Prepaid Amount (₦)</label><input type="number" class="form-control" id="prepaidAmount" placeholder="Optional"></div>
+                <div class="form-group"><label>Rate Type</label>
+                    <select class="form-control" id="rateType" onchange="updateComputersByRate()">
+                        <option value="standard">Standard — ₦500/hr (i5, 8GB, RTX 1060)</option>
+                        <option value="vip">VIP — ₦1,000/hr (i7, 16GB, RTX 3060)</option>
+                        <option value="premium">Premium — ₦2,000/hr (i9, 32GB, RTX 4090)</option>
+                    </select>
                 </div>
-                <div style="display:flex;gap:10px;margin-top:25px;">
+                <div class="form-group"><label>Computer</label><select class="form-control" id="sessionComputer"><option value="">Select Computer</option></select></div>
+                <div style="display:flex;gap:10px;margin-top:20px;">
                     <button type="button" class="btn btn-success" style="flex:1;" onclick="startSession()">Start Session</button>
                     <button type="button" class="btn" style="flex:1;background:var(--gray);color:white;" onclick="closeModal('newSessionModal')">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
-    <div class="modal-overlay" id="addComputerModal">
+    <div class="modal-overlay" id="addComputerModal">    <div class="modal-overlay" id="addComputerModal">
         <div class="modal">
             <div class="modal-header">
                 <h3>Add New Computer</h3>
@@ -519,11 +522,11 @@
             { id: 16, name: 'PC-16', status: 'available',   specs: TIERS.premium.specs,  tier: 'premium',  zone: 'Premium Suite' }
         ];
         let customers = [
-            { id: 1, name: 'Hamza Halimat', phone: '+234 801 234 5678', email: 'leema@email.com', visits: 45, spent: 47500, status: 'active', membership: 'VIP' },
-            { id: 2, name: 'Usman Yusuf', phone: '+234 802 345 6789', email: 'usman@email.com', visits: 28, spent: 26700, status: 'active', membership: 'Regular' },
-            { id: 3, name: 'Idris Abdullah', phone: '+234 803 456 7890', email: 'idris@email.com', visits: 67, spent: 77100, status: 'active', membership: 'Premium' },
-            { id: 4, name: 'Fatima Muhammad', phone: '+234 804 567 8901', email: 'fatima@email.com', visits: 15, spent: 14100, status: 'inactive', membership: 'Regular' },
-            { id: 5, name: 'Ridwan Adediran', phone: '+234 805 678 9012', email: 'ridade@email.com', visits: 89, spent: 111250, status: 'active', membership: 'VIP' }
+            { id: 1, name: 'Hamza Halimat', phone: '+234 801 234 5678', email: 'leema@gmail.com', visits: 45, spent: 47500, status: 'active', membership: 'VIP' },
+            { id: 2, name: 'Usman Yusuf', phone: '+234 802 345 6789', email: 'usman@gmail.com', visits: 28, spent: 26700, status: 'active', membership: 'Standard' },
+            { id: 3, name: 'Idris Abdullah', phone: '+234 803 456 7890', email: 'Idris@gmail.com', visits: 67, spent: 77100, status: 'active', membership: 'Premium' },
+            { id: 4, name: 'Fatima Muhammad', phone: '+234 804 567 8901', email: 'fatima@gmail.com', visits: 15, spent: 14100, status: 'active', membership: 'Standard' },
+            { id: 5, name: 'Ridwan Adediran', phone: '+234 805 678 9012', email: 'ridade@gmail.com', visits: 89, spent: 111250, status: 'active', membership: 'VIP' }
         ];
         let sessions = [
             { id: 1, customerId: 1, computerId: 2, startTime: new Date(Date.now() - 3600000), rate: 500, tierType: 'standard', prepaid: 2000, status: 'active' },
@@ -535,11 +538,11 @@
             { id: 7, customerId: 5, computerId: 15, startTime: new Date(Date.now() - 2700000), rate: 2000, tierType: 'premium', prepaid: 2000, status: 'active' }
         ];
         let billingRecords = [
-            { id: 'INV-001', customer: 'Hamza Halimat', date: '2026-05-05', items: 3, total: 6750.00, payment: 'Cash', status: 'paid' },
-            { id: 'INV-002', customer: 'Usman Yusuf', date: '2026-05-05', items: 2, total: 4275.00, payment: 'Card', status: 'paid' },
-            { id: 'INV-003', customer: 'Idris Abdullah', date: '2026-05-04', items: 5, total: 9300.00, payment: 'Card', status: 'paid' },
-            { id: 'INV-004', customer: 'Fatima Muhammad', date: '2026-05-04', items: 1, total: 1800.00, payment: 'Cash', status: 'paid' },
-            { id: 'INV-005', customer: 'Ridwan Adediran', date: '2026-05-03', items: 4, total: 8250.00, payment: 'Card', status: 'paid' }
+            { id: 'INV-001', customer: 'John Smith', date: '2026-05-05', items: 3, total: 6750.00, payment: 'Cash', status: 'paid' },
+            { id: 'INV-002', customer: 'Sarah Johnson', date: '2026-05-05', items: 2, total: 4275.00, payment: 'Card', status: 'paid' },
+            { id: 'INV-003', customer: 'Mike Davis', date: '2026-05-04', items: 5, total: 9300.00, payment: 'Card', status: 'paid' },
+            { id: 'INV-004', customer: 'Emily Brown', date: '2026-05-04', items: 1, total: 1800.00, payment: 'Cash', status: 'paid' },
+            { id: 'INV-005', customer: 'David Wilson', date: '2026-05-03', items: 4, total: 8250.00, payment: 'Card', status: 'paid' }
         ];
         function formatNaira(amount) {
             return '₦' + amount.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -664,13 +667,19 @@
             return ((end - session.startTime) / 3600000) * session.rate;
         }
         function populateSessionDropdowns() {
-            // Reset form
-            document.getElementById('sessionCustomerName').value = '';
-            document.getElementById('selectedTier').value = '';
-            document.getElementById('sessionComputer').innerHTML = '<option value="">— Choose a tier first —</option>';
-            document.getElementById('tierComputerLabel').textContent = '';
-            document.querySelectorAll('.tier-card').forEach(c => c.style.opacity = '1');
-            document.querySelectorAll('.tier-card').forEach(c => c.style.transform = 'scale(1)');
+            document.getElementById('sessionCustomer').innerHTML = '<option value="">Select Customer</option>' +
+                customers.map(function(c) { return '<option value="' + c.id + '">' + c.name + ' (' + c.membership + ')</option>'; }).join('');
+            updateComputersByRate();
+        }
+        function updateComputersByRate() {
+            const tier = document.getElementById('rateType').value;
+            const available = computers.filter(function(c) { return c.tier === tier && c.status === 'available'; });
+            if (available.length === 0) {
+                document.getElementById('sessionComputer').innerHTML = '<option value="">No computers available in this tier</option>';
+            } else {
+                document.getElementById('sessionComputer').innerHTML = '<option value="">Select Computer</option>' +
+                    available.map(function(c) { return '<option value="' + c.id + '">' + c.name + ' · ' + c.specs + '</option>'; }).join('');
+            }
         }
         function selectTier(tier) {
             document.getElementById('selectedTier').value = tier;
@@ -702,25 +711,19 @@
             }
         }
         function startSession() {
-            const customerName = document.getElementById('sessionCustomerName').value.trim();
-            const tier = document.getElementById('selectedTier').value;
+            const customerId = parseInt(document.getElementById('sessionCustomer').value);
             const computerId = parseInt(document.getElementById('sessionComputer').value);
-            if (!customerName) { alert('Please enter the customer name'); return; }
-            if (!tier) { alert('Please select a rate tier'); return; }
+            const tier = document.getElementById('rateType').value;
+            if (!customerId) { alert('Please select a customer'); return; }
             if (!computerId) { alert('Please select a computer'); return; }
-            // Add customer if new
-            let customer = customers.find(c => c.name.toLowerCase() === customerName.toLowerCase());
-            if (!customer) {
-                customer = { id: customers.length + 1, name: customerName, phone: 'N/A', email: 'N/A', visits: 0, spent: 0, status: 'active', membership: TIERS[tier].name };
-                customers.push(customer);
-            }
             const rate = TIERS[tier].rate;
-            sessions.push({ id: sessions.length + 1, customerId: customer.id, computerId, startTime: new Date(), rate, tierType: tier, prepaid: 0, status: 'active' });
-            const computer = computers.find(c => c.id === computerId);
+            sessions.push({ id: sessions.length + 1, customerId: customerId, computerId: computerId, startTime: new Date(), rate: rate, tierType: tier, prepaid: 0, status: 'active' });
+            const computer = computers.find(function(c) { return c.id === computerId; });
             if (computer) computer.status = 'occupied';
+            const customer = customers.find(function(c) { return c.id === customerId; });
             closeModal('newSessionModal');
             renderComputers(); renderRecentSessions(); updateStats();
-            alert(`Session started for ${customerName}!\n${TIERS[tier].name} tier · ₦${rate.toLocaleString()}/hr`);
+            alert('Session started for ' + (customer ? customer.name : '') + '!\n' + TIERS[tier].name + ' tier · ₦' + rate.toLocaleString() + '/hr');
         }
         function endSession(sessionId) {
             const session = sessions.find(s=>s.id===sessionId);
