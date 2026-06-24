@@ -477,13 +477,13 @@
             </div>
             <form>
                 <div class="form-row">
-                    <div class="form-group"><label>First Name</label><input type="text" class="form-control" placeholder="First name"></div>
-                    <div class="form-group"><label>Last Name</label><input type="text" class="form-control" placeholder="Last name"></div>
+                    <div class="form-group"><label>First Name</label><input type="text" class="form-control" id="newCustFirst" placeholder="First name"></div>
+                    <div class="form-group"><label>Last Name</label><input type="text" class="form-control" id="newCustLast" placeholder="Last name"></div>
                 </div>
-                <div class="form-group"><label>Phone Number</label><input type="tel" class="form-control" placeholder="+234 800 000 0000"></div>
-                <div class="form-group"><label>Email</label><input type="email" class="form-control" placeholder="customer@email.com"></div>
-                <div class="form-group"><label>Membership Type</label><select class="form-control"><option>Regular</option><option>VIP</option><option>Premium</option></select></div>
-                <button type="button" class="btn btn-primary" style="width:100%;margin-top:20px;">Save Customer</button>
+                <div class="form-group"><label>Phone Number</label><input type="tel" class="form-control" id="newCustPhone" placeholder="+234 800 000 0000"></div>
+                <div class="form-group"><label>Email</label><input type="email" class="form-control" id="newCustEmail" placeholder="customer@email.com"></div>
+                <div class="form-group"><label>Membership Type</label><select class="form-control" id="newCustMembership"><option>Standard</option><option>VIP</option><option>Premium</option></select></div>
+                <button type="button" class="btn btn-primary" style="width:100%;margin-top:20px;" onclick="saveNewCustomer()">Save Customer</button>
             </form>
         </div>
     </div>
@@ -519,7 +519,7 @@
             { id: 16, name: 'PC-16', status: 'available',   specs: TIERS.premium.specs,  tier: 'premium',  zone: 'Premium Suite' }
         ];
         let customers = [
-            { id: 1, name: 'Hamza Halimat', phone: '+234 801 234 5678', email: 'leemah@email.com', visits: 45, spent: 47500, status: 'active', membership: 'VIP' },
+            { id: 1, name: 'Hamza Halimat', phone: '+234 801 234 5678', email: 'leema@email.com', visits: 45, spent: 47500, status: 'active', membership: 'VIP' },
             { id: 2, name: 'Usman Yusuf', phone: '+234 802 345 6789', email: 'usman@email.com', visits: 28, spent: 26700, status: 'active', membership: 'Regular' },
             { id: 3, name: 'Idris Abdullah', phone: '+234 803 456 7890', email: 'idris@email.com', visits: 67, spent: 77100, status: 'active', membership: 'Premium' },
             { id: 4, name: 'Fatima Muhammad', phone: '+234 804 567 8901', email: 'fatima@email.com', visits: 15, spent: 14100, status: 'inactive', membership: 'Regular' },
@@ -792,6 +792,34 @@
                     `<tr><td>#${c.id}</td><td><strong>${c.name}</strong></td><td>${c.phone}</td><td>${c.email}</td><td>${c.visits}</td><td class="naira">${formatNaira(c.spent)}</td><td><span class="badge ${c.status==='active'?'badge-success':'badge-warning'}">${c.status}</span></td><td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;">Edit</button></td></tr>`
                 ).join('');
             });
+        }
+
+        function saveNewCustomer() {
+            const first = document.getElementById('newCustFirst').value.trim();
+            const last = document.getElementById('newCustLast').value.trim();
+            const phone = document.getElementById('newCustPhone').value.trim();
+            const email = document.getElementById('newCustEmail').value.trim();
+            const membership = document.getElementById('newCustMembership').value;
+            if (!first || !last) { alert('Please enter both first and last name'); return; }
+            const newCustomer = {
+                id: customers.length + 1,
+                name: first + ' ' + last,
+                phone: phone || 'N/A',
+                email: email || 'N/A',
+                visits: 0,
+                spent: 0,
+                status: 'active',
+                membership: membership
+            };
+            customers.push(newCustomer);
+            // Clear form
+            document.getElementById('newCustFirst').value = '';
+            document.getElementById('newCustLast').value = '';
+            document.getElementById('newCustPhone').value = '';
+            document.getElementById('newCustEmail').value = '';
+            closeModal('addCustomerModal');
+            renderCustomers();
+            alert('Customer ' + newCustomer.name + ' added successfully!');
         }
         document.addEventListener('DOMContentLoaded',()=>{renderComputers();renderRecentSessions();updateStats();});
         document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active');}));
